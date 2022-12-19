@@ -20,6 +20,7 @@ export class MainScene extends Scene {
   private carrots: ArcadeGroup | null = null
   private carrotsCollected = 0
   private carrotsCollectedText: GameObjects.Text | null = null
+  private pointerMark = 0
 
   constructor () {
     super({ key: 'mainScene' })
@@ -96,6 +97,10 @@ export class MainScene extends Scene {
     this.carrotsCollectedText = this.add.text(240, 10, 'Carrots: 0', style)
       .setScrollFactor(0)
       .setOrigin(0.5, 0)
+
+    if (import.meta.env.VITE_APP_DEBUG === 'true') {
+      this.input.addPointer()
+    }
   }
 
   update (): void {
@@ -122,7 +127,13 @@ export class MainScene extends Scene {
       } else if (this.cursors.right.isDown && !touchingDown) {
         this.player.setVelocityX(200)
       } else if (this.input.activePointer.isDown && !touchingDown) {
-        if (this.input.activePointer.worldX < this.player.getCenter().x) {
+        console.log(this.input.activePointer)
+
+        if (!this.pointerMark) {
+          this.pointerMark = this.input.activePointer.worldX
+        }
+
+        if (this.input.activePointer.worldX < this.pointerMark) {
           this.player.setVelocityX(-200)
         } else {
           this.player.setVelocityX(200)
@@ -130,6 +141,7 @@ export class MainScene extends Scene {
       } else {
         // stop movement if not left or right
         this.player.setVelocityX(0)
+        this.pointerMark = 0
       }
 
       this.horizontalWrap(this.player)
@@ -146,7 +158,7 @@ export class MainScene extends Scene {
         const scrollY = this.cameras.main.scrollY
 
         if (platform.y >= scrollY + 700) {
-          platform.y = scrollY - Math.Between(50, 100)
+          platform.y = scrollY - Math.Between(50, 80)
           platform.body.updateFromGameObject()
           // create a carrot above the platform being reused
           this.addCarrotAbove(platform)
