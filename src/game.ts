@@ -121,6 +121,12 @@ export class MainScene extends Scene {
         this.player.setVelocityX(-200)
       } else if (this.cursors.right.isDown && !touchingDown) {
         this.player.setVelocityX(200)
+      } else if (this.input.activePointer.isDown && !touchingDown) {
+        if (this.input.activePointer.worldX < this.player.getCenter().x) {
+          this.player.setVelocityX(-200)
+        } else {
+          this.player.setVelocityX(200)
+        }
       } else {
         // stop movement if not left or right
         this.player.setVelocityX(0)
